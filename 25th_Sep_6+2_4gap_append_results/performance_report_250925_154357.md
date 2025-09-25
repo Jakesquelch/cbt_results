@@ -1,30 +1,27 @@
 
-Performance Report for 22-Sep-optimised
-=======================================
+Performance Report for 25th-Sep-6+2-4gap-append
+===============================================
 
 Table of contents
 =================
 
-* [Summary of results for 22-Sep-optimised](#summary-of-results-for-22-sep-optimised)
+* [Summary of results for 25th-Sep-6+2-4gap-append](#summary-of-results-for-25th-sep-62-4gap-append)
 * [Response Curves](#response-curves)
-	* [Sequential Read](#sequential-read)
+	* [Sequential Write](#sequential-write)
 * [Configuration yaml](#configuration-yaml)
 
-# Summary of results for 22-Sep-optimised
+# Summary of results for 25th-Sep-6+2-4gap-append
   
 |Workload Name|Maximum Throughput|Latency (ms)|  
 | :--- | ---: | ---: |  
-|[262144_read](#262144-read)|6700 MB/s|20.0|  
-|[524288_read](#524288-read)|7571 MB/s|17.7|  
-|[1048576_read](#1048576-read)|8137 MB/s|24.7|
+|[4096_write](#4096-write)|18621 IOps|41.2|
 # Response Curves
 
-## Sequential Read
+## Sequential Write
 
 |||
 | :---: | :---: |
-|<a name="262144-read"></a>![256.0KK  Sequential Read](plots.250922_201821/262144_read.png)|<a name="524288-read"></a>![512.0KK  Sequential Read](plots.250922_201821/524288_read.png)|
-|<a name="1048576-read"></a>![1024.0KK  Sequential Read](plots.250922_201821/1048576_read.png)||
+|<a name="4096-write"></a>![4KK  Sequential Write](plots.250925_154357/4096_write.png)||
 
 # Configuration yaml
 
@@ -51,77 +48,33 @@ Table of contents
     time: 90
     time_based: true
     use_existing_volumes: true
-    vol_size: 1204500
+    vol_size: 1000
     volumes_per_client:
     - 16
     workloads:
-      1Mseqread:
-        jobname: seqread
-        mode: read
+      seq4kwriteappend:
+        jobname: seqwrite
+        mode: write:4092k
         numjobs:
         - 1
-        op_size: 1048576
+        op_size: 4096
+        pre_workload_script: sudo /home/ljsanders/examples_jake/mkdelvols.cbt
         total_iodepth:
-        - 1
         - 2
-        - 4
         - 8
-        - 12
         - 16
         - 24
         - 32
         - 48
         - 64
-        - 96
-        - 128
-        - 192
-      512kseqread:
-        jobname: seqread
-        mode: read
-        numjobs:
-        - 1
-        op_size: 524288
-        total_iodepth:
-        - 1
-        - 2
-        - 4
-        - 8
-        - 12
-        - 16
-        - 24
-        - 32
-        - 48
-        - 64
-        - 96
         - 128
         - 256
-      precondition:
-        jobname: precond1rw
-        mode: randwrite
-        monitor: false
-        numjobs:
-        - 1
-        op_size: 65536
-        time: 600
-        total_iodepth:
-        - 16
-      seq256kread:
-        jobname: seqread
-        mode: read
-        numjobs:
-        - 1
-        op_size: 262144
-        total_iodepth:
-        - 1
-        - 2
-        - 4
-        - 8
-        - 16
-        - 32
-        - 64
-        - 128
-        - 256
+        - 384
         - 512
+        - 768
+        - 1024
+        - 1280
+        - 1536
 cluster:
   archive_dir: /tmp/cbt
   ceph-mgr_cmd: /usr/bin/ceph-mgr
@@ -132,7 +85,7 @@ cluster:
   clients:
   - --- server1 ---
   clusterid: ceph
-  conf_file: /cbt/ceph.conf.4x1x1.fs
+  conf_file: /etc/ceph/ceph.conf
   fs: xfs
   head: --- server1 ---
   iterations: 1
